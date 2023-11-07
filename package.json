@@ -5,7 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "build": "npm install && npm run build-server"
+    "build": "npm install && npm run build-server",
+    "build-server": "echo 'Building server...' && npm run compile-server",
+    "compile-server": "echo 'Compiling server...'"
   },
   "author": "",
   "license": "ISC",
