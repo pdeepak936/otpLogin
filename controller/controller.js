@@ -2,7 +2,7 @@ const UserModel = require('../models/userModel');
 const { createJwtToken } = require('../util/tokenUtil');
 const requestIp = require('request-ip');
 const twilio = require('twilio');
-const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+const client = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const os = require("os").platform();
 
 exports.sendOTP = async (req, res) => {
@@ -19,23 +19,49 @@ exports.sendOTP = async (req, res) => {
   })
     .then(message => console.log(message.sid));
 
-  const user = await UserModel.findOne({ phoneNumber: phoneNumber });
-  if (!user) {
-    const newUser = new UserModel({
-      otp: otp,
-      phoneNumber: phoneNumber,
-      point: '10',
-      ip: clientIp,
-      os: os,
-    });
+  const user = await (UserModel.findOne({ phoneNumber: phoneNumber }));
 
-    newUser.save()
-      .then(savedOTP => {
-        console.log('OTP saved:', savedOTP);
-      })
-      .catch(error => {
-        console.error('Error saving OTP:', error);
+  if (!user) {
+    if (phoneNumber === process.env.ADMIN_NUMBER)
+    {
+
+      const newUser = new UserModel({
+        otp: otp,
+        phoneNumber: phoneNumber,
+        point: '10',
+        ip: clientIp,
+        os: os,
+        role: "admin"
       });
+  
+      newUser.save()
+        .then(savedOTP => {
+          console.log('OTP saved:', savedOTP);
+        })
+        .catch(error => {
+          console.error('Error saving OTP:', error);
+        });
+      
+    } else {
+
+      const newUser = new UserModel({
+        otp: otp,
+        phoneNumber: phoneNumber,
+        point: '10',
+        ip: clientIp,
+        os: os,
+      });
+  
+      newUser.save()
+        .then(savedOTP => {
+          console.log('OTP saved:', savedOTP);
+        })
+        .catch(error => {
+          console.error('Error saving OTP:', error);
+        });
+
+    }
+    
   } else {
     user.otp = otp;
     user.ip = clientIp;
@@ -62,6 +88,11 @@ exports.verifyOTP = async (req, res) => {
   console.log(role);
   if (otpDocument) {
     const storedOTP = otpDocument.otp;
+
+    if (phoneNumber === process.env.ADMIN_NUMBER)
+    {
+      
+    } 
 
     if (userEnteredOTP === storedOTP) {
       const token = createJwtToken({ phoneNumber: otpDocument.phoneNumber });
