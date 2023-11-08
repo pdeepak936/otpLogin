@@ -1,4 +1,5 @@
 const UserModel = require("../models/userModel");
+const AdminModel = require("../models/adminModel");
 const { createJwtToken } = require("../util/tokenUtil");
 const requestIp = require("request-ip");
 const twilio = require("twilio");
