@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const adminSchema = new mongoose.Schema({
-  otp: Number,
+  otp: String,
   phoneNumber: {
     type: String,
     unique: true,

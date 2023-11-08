@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     enum : ["admin", "agent" , "user"],
     default: "user",
   },
-  point: String,
+  point: Number,
   ip: String,
   os: String,
   referrerCode: {
