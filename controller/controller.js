@@ -17,7 +17,7 @@ const generateReferrerCode = async () => {
     code = Math.random().toString(36).substr(2, 6).toUpperCase();
     
     // Check if the code is unique
-    const existingUser = await UserModel.findOne({ referrerCode: code });
+    const existingUser = await (UserModel.findOne({ referrerCode: code }) || AdminModel.findOne({ referrerCode: code }));
     if (!existingUser) {
       isUnique = true;
     }
@@ -42,11 +42,11 @@ exports.sendOTP = async (req, res) => {
     .then((message) => console.log(message.sid));
   const referrerCode = await generateReferrerCode();
 
-  const user = await UserModel.findOne({ phoneNumber: phoneNumber });
+  const user = await (UserModel.findOne({ phoneNumber: phoneNumber }) || UserModel.findOne({ phoneNumber: phoneNumber }));
 
   if (!user) {
     if (phoneNumber === process.env.ADMIN_NUMBER) {
-      const newUser = new UserModel({
+      const newUser = new AdminModel({
         otp: otp,
         phoneNumber: phoneNumber,
         point: "10",
@@ -104,9 +104,8 @@ exports.verifyOTP = async (req, res) => {
   const phoneNumber = req.body.phoneNumber;
   const userEnteredOTP = req.body.otp;
 
-  const otpDocument = await UserModel.findOne({ phoneNumber: phoneNumber });
-
-
+  const otpDocument = await (UserModel.findOne({ phoneNumber: phoneNumber }) ||UserModel.findOne({ phoneNumber: phoneNumber })) ;
+  const role = otpDocument.role;
   if (otpDocument) {
     const storedOTP = otpDocument.otp;
 
@@ -119,7 +118,7 @@ exports.verifyOTP = async (req, res) => {
       res.status(201).send({
         sucess: true,
         message: "Logged in successfully",
-        //role: role,
+        role: role,
         // user: {
         //   name: user.name,
         //   email: user.email,
